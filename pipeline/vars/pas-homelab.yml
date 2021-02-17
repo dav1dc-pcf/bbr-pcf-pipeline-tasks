@@ -22,7 +22,7 @@ sftp_output:
 
 # Details for Git Repo where pipeline tasks are stored
 git:
-  repo_url: https://github.com/pivotal-cf/bbr-pcf-pipeline-tasks.git
+  repo_url: https://github.com/dav1dc-pcf/bbr-pcf-pipeline-tasks.git
   branch: master
   bbr-pipeline-tasks-repo-version: v2.1.0
   private_key: ((github_ssh_key.private_key))
