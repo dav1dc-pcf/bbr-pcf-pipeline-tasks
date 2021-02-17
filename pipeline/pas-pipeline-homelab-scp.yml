@@ -117,7 +117,7 @@ resources:
   source:
     uri: ((git.repo_url))
     branch: ((git.branch))
-    tag_filter: ((git.bbr-pipeline-tasks-repo-version))
+#    tag_filter: ((git.bbr-pipeline-tasks-repo-version))
 - name: bbr-release
   type: pivnet
   source:

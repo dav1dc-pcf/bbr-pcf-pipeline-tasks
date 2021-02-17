@@ -4,7 +4,7 @@ platform: linux
 image_resource:
   type: registry-image
   source:
-    repository: https://harbor.home.pvt/ci/bbr-pcf-pipeline-tasks
+    repository: harbor.home.pvt/ci/bbr-pcf-pipeline-tasks
     tag: final
 
 inputs:
