@@ -6,13 +6,6 @@ opsman_credentials: &opsman_credentials
   OPSMAN_PASSWORD: ((opsman-password))
   OPSMAN_PRIVATE_KEY: ((opsman-private-key))
 
-s3_credentials: &s3_credentials
-  bucket: ((storage-backup-bucket))
-  region_name: ((storage-region))
-  access_key_id: ((storage-access-key-id))
-  secret_access_key: ((storage-secret-access-key))
-  endpoint: ((storage-endpoint))
-
 scp_credentials: &scp_credentials
   host: ((sftp_output.host))
   user: ((sftp_output.user))
