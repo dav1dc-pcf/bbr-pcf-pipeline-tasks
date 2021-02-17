@@ -1,0 +1,30 @@
+---
+pivnet-api-token: ((pivnet_token))
+
+# Ops Manager credentials
+skip-ssl-validation: true
+opsman-url: https://opsmgr.home.pvt
+opsman-username: ((opsmgr.username))
+opsman-password: ((opsmgr.password))
+opsman-private-key:
+#  | # optional, Ops Manager VM SSH private key
+#  -----BEGIN EXAMPLE PRIVATE KEY-----
+#  ...
+#  -----END EXAMPLE PRIVATE KEY-----
+
+# S3-compatible bucket credentials
+storage-backup-bucket: bbr-backups
+storage-region: 
+storage-endpoint: http://minio.home.pvt:9000
+storage-access-key-id: ((minio.username))
+storage-secret-access-key: ((minio.password))
+
+# SFTP Output destination details
+sftp_output:
+  host: ubuntu.home.pvt
+  user: ubuntu
+  base_directory: Backups
+  destdir: Backups
+
+# bbr-pcf-pipeline-tasks pinned tag version
+bbr-pipeline-tasks-repo-version: v2.1.0

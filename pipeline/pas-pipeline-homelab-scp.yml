@@ -1,0 +1,153 @@
+---
+opsman_credentials: &opsman_credentials
+  SKIP_SSL_VALIDATION: ((skip-ssl-validation))
+  OPSMAN_URL: ((opsman-url))
+  OPSMAN_USERNAME: ((opsman-username))
+  OPSMAN_PASSWORD: ((opsman-password))
+  OPSMAN_PRIVATE_KEY: ((opsman-private-key))
+
+s3_credentials: &s3_credentials
+  bucket: ((storage-backup-bucket))
+  region_name: ((storage-region))
+  access_key_id: ((storage-access-key-id))
+  secret_access_key: ((storage-secret-access-key))
+  endpoint: ((storage-endpoint))
+
+scp_credentials: &scp_credentials
+  host: ((sftp_output.host))
+  user: ((sftp_output.user))
+  private_key: ((sftp.private_key))
+  base_directory: ((sftp_output.base_directory))
+
+jobs:
+- name: export-om-installation
+  serial: true
+  plan:
+  - in_parallel:
+    - get: bbr-pipeline-tasks-repo
+    - get: nightly-backup-trigger
+      trigger: true
+  - task: export-om-installation
+    file: bbr-pipeline-tasks-repo/tasks/export-om-installation/task.yml
+    params:
+      SKIP_SSL_VALIDATION: ((skip-ssl-validation))
+      OPSMAN_URL: ((opsman-url))
+      OPSMAN_USERNAME: ((opsman-username))
+      OPSMAN_PASSWORD: ((opsman-password))
+  - put: om-backup-artifact
+    params:
+      glob: om-installation/installation_*.zip
+      destdir: Backups
+
+- name: bbr-backup-pas
+  serial: true
+  plan:
+  - in_parallel:
+    - get: bbr-pipeline-tasks-repo
+    - get: bbr-release
+    - get: nightly-backup-trigger
+      trigger: true
+  - task: check-opsman-status
+    file: bbr-pipeline-tasks-repo/tasks/check-opsman-status/task.yml
+    params:
+      <<: *opsman_credentials
+  - task: extract-binary
+    file: bbr-pipeline-tasks-repo/tasks/extract-bbr-binary/task.yml
+  - task: bbr-backup-pas
+    file: bbr-pipeline-tasks-repo/tasks/bbr-backup-pas/task.yml
+    params:
+      <<: *opsman_credentials
+    on_failure:
+      task: bbr-cleanup-pas
+      file: bbr-pipeline-tasks-repo/tasks/bbr-cleanup-pas/task.yml
+      params:
+        <<: *opsman_credentials
+  - put: pas-backup-bucket
+    params:
+      glob: pas-backup-artifact/pas-backup_*.tar
+      destdir: Backups
+
+- name: bbr-backup-director
+  serial: true
+  plan:
+  - in_parallel:
+    - get: bbr-pipeline-tasks-repo
+    - get: bbr-release
+    - get: nightly-backup-trigger
+      trigger: true
+  - task: check-opsman-status
+    file: bbr-pipeline-tasks-repo/tasks/check-opsman-status/task.yml
+    params:
+      <<: *opsman_credentials
+  - task: extract-binary
+    file: bbr-pipeline-tasks-repo/tasks/extract-bbr-binary/task.yml
+  - task: bbr-backup-director
+    file: bbr-pipeline-tasks-repo/tasks/bbr-backup-director/task.yml
+    params:
+      <<: *opsman_credentials
+    on_failure:
+      task: bbr-cleanup-director
+      file: bbr-pipeline-tasks-repo/tasks/bbr-cleanup-director/task.yml
+      params:
+        <<: *opsman_credentials
+  - put: director-backup-bucket
+    params:
+      glob: director-backup-artifact/director-backup_*.tar
+      destdir: Backups
+
+resource_types:
+- name: pivnet
+  type: docker-image
+  source:
+    repository: pivotalcf/pivnet-resource
+    tag: latest-final
+- name: scp
+  type: docker-image
+  source:
+    repository: dav1dc/scp-resource
+    tag: latest
+
+- name: docker-image-resource
+  type: docker-image
+  privileged: true
+  source:
+    repository: harbor.home.pvt
+    tag: latest
+
+resources:
+- name: nightly-backup-trigger
+  type: time
+  source:
+    start: 2:00 AM
+    stop: 3:00 AM
+    location: America/Toronto
+
+- name: bbr-pipeline-tasks-repo
+  type: git
+  source:
+    uri: https://github.com/pivotal-cf/bbr-pcf-pipeline-tasks.git
+    branch: master
+    tag_filter: ((bbr-pipeline-tasks-repo-version))
+- name: bbr-release
+  type: pivnet
+  source:
+    api_token: ((pivnet-api-token))
+    product_slug: p-bosh-backup-and-restore
+
+- name: om-backup-artifact
+  type: scp
+  source:
+    <<: *scp_credentials
+    glob: installation_*.zip
+- name: pas-backup-bucket
+  type: scp
+  source:
+    <<: *scp_credentials
+    glob: pas-backup_*.tar
+- name: director-backup-bucket
+  type: scp
+  source:
+    <<: *scp_credentials
+    glob: director-backup_*.tar
+
+# https://github.com/ECSTeam/scp-resource
