@@ -12,19 +12,17 @@ opsman-private-key:
 #  ...
 #  -----END EXAMPLE PRIVATE KEY-----
 
-# S3-compatible bucket credentials
-storage-backup-bucket: bbr-backups
-storage-region: 
-storage-endpoint: http://minio.home.pvt:9000
-storage-access-key-id: ((minio.username))
-storage-secret-access-key: ((minio.password))
-
 # SFTP Output destination details
 sftp_output:
   host: ubuntu.home.pvt
   user: ubuntu
   base_directory: Backups
   destdir: Backups
+  private_key: ((sftp.private_key))
 
-# bbr-pcf-pipeline-tasks pinned tag version
-bbr-pipeline-tasks-repo-version: v2.1.0
+# Details for Git Repo where pipeline tasks are stored
+git:
+  repo_url: https://github.com/pivotal-cf/bbr-pcf-pipeline-tasks.git
+  branch: master
+  bbr-pipeline-tasks-repo-version: v2.1.0
+  private_key: ((github_ssh_key.private_key))

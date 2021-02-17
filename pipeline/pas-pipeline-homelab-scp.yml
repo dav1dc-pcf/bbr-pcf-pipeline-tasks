@@ -9,7 +9,7 @@ opsman_credentials: &opsman_credentials
 scp_credentials: &scp_credentials
   host: ((sftp_output.host))
   user: ((sftp_output.user))
-  private_key: ((sftp.private_key))
+  private_key: ((sftp_output.private_key))
   base_directory: ((sftp_output.base_directory))
 
 jobs:
@@ -23,14 +23,11 @@ jobs:
   - task: export-om-installation
     file: bbr-pipeline-tasks-repo/tasks/export-om-installation/task.yml
     params:
-      SKIP_SSL_VALIDATION: ((skip-ssl-validation))
-      OPSMAN_URL: ((opsman-url))
-      OPSMAN_USERNAME: ((opsman-username))
-      OPSMAN_PASSWORD: ((opsman-password))
+      <<: *opsman_credentials
   - put: om-backup-artifact
     params:
       glob: om-installation/installation_*.zip
-      destdir: Backups
+      destdir: ((sftp_output.destdir))
 
 - name: bbr-backup-pas
   serial: true
@@ -58,7 +55,7 @@ jobs:
   - put: pas-backup-bucket
     params:
       glob: pas-backup-artifact/pas-backup_*.tar
-      destdir: Backups
+      destdir: ((sftp_output.destdir))
 
 - name: bbr-backup-director
   serial: true
@@ -86,7 +83,7 @@ jobs:
   - put: director-backup-bucket
     params:
       glob: director-backup-artifact/director-backup_*.tar
-      destdir: Backups
+      destdir: ((sftp_output.destdir))
 
 resource_types:
 - name: pivnet
@@ -118,9 +115,9 @@ resources:
 - name: bbr-pipeline-tasks-repo
   type: git
   source:
-    uri: https://github.com/pivotal-cf/bbr-pcf-pipeline-tasks.git
-    branch: master
-    tag_filter: ((bbr-pipeline-tasks-repo-version))
+    uri: ((git.repo_url))
+    branch: ((git.branch))
+    tag_filter: ((git.bbr-pipeline-tasks-repo-version))
 - name: bbr-release
   type: pivnet
   source:
