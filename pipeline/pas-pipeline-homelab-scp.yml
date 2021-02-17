@@ -89,19 +89,12 @@ resource_types:
 - name: pivnet
   type: docker-image
   source:
-    repository: pivotalcf/pivnet-resource
+    repository: harbor.home.pvt/ci/pivnet-resource
     tag: latest-final
 - name: scp
   type: docker-image
   source:
-    repository: dav1dc/scp-resource
-    tag: latest
-
-- name: docker-image-resource
-  type: docker-image
-  privileged: true
-  source:
-    repository: harbor.home.pvt
+    repository: harbor.home.pvt/ci/scp-resource
     tag: latest
 
 resources:
