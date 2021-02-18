@@ -6,11 +6,7 @@ skip-ssl-validation: true
 opsman-url: https://opsmgr.home.pvt
 opsman-username: ((opsmgr.username))
 opsman-password: ((opsmgr.password))
-opsman-private-key:
-#  | # optional, Ops Manager VM SSH private key
-#  -----BEGIN EXAMPLE PRIVATE KEY-----
-#  ...
-#  -----END EXAMPLE PRIVATE KEY-----
+opsman-private-key: ((opsmgr_ssh_key.private_key))
 
 # SFTP Output destination details
 sftp_output:
