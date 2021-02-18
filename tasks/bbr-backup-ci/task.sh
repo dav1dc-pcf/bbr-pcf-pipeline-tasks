@@ -11,7 +11,7 @@ source "${scripts}/export-director-metadata"
 
 current_date="$( date +"%Y-%m-%d-%H-%M-%S" )"
 
-pushd pas-backup-artifact
+pushd ci-backup-artifact
   # shellcheck disable=SC1090
   source "../${scripts}/deployment-backup"
   tar -cvf "ci-backup_${current_date}.tar" --remove-files -- */*

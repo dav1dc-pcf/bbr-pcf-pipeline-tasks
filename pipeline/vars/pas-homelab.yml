@@ -26,3 +26,5 @@ git:
   branch: master
   bbr-pipeline-tasks-repo-version: v2.1.0
   private_key: ((github_ssh_key.private_key))
+
+concourse_deployment: concourse-homelab

@@ -124,7 +124,7 @@ resources:
   source:
     <<: *scp_credentials
     glob: installation_*.zip
-- name: pas-backup-bucket
+- name: ci-backup-bucket
   type: scp
   source:
     <<: *scp_credentials
